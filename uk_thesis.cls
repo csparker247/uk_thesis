@@ -8,6 +8,21 @@
   bibliography=totoc
 ]{scrbook}
 
+% ~~~ CLASS OPTIONS ~~~
+
+% Set document type (Thesis/Dissertation). Arg should be in Camel case.
+\newcommand{\doctype}[1]{
+    \renewcommand{\@DocType}{#1}
+    \renewcommand{\@DOCTYPE}{\expandafter\MakeUppercase\expandafter{#1}}
+    \renewcommand{\@doctype}{\expandafter\MakeLowercase\expandafter{#1}}
+}
+\newcommand{\@doctype}{thesis} % lower case doctype
+\newcommand{\@DOCTYPE}{THESIS} % upper case doctype
+\newcommand{\@DocType}{Thesis} % camel case doctype
+\DeclareOption{thesis}{\doctype{Thesis}} % set to thesis mode
+\DeclareOption{dissertation}{\doctype{Dissertation}} % set to dissertation mode
+\ProcessOptions*\relax
+
 % ~~~ PACKAGES NECESSARY ~~~
 
 \RequirePackage[
@@ -81,7 +96,14 @@
 \newcommand{\@signature}[2]{\uline{\ \hfill{}#2\hfill{}\ }\\#1\vspace*{5mm}} % Provides a blank labeled #1 with #2 filled in. Expands to fill its container.
 
 \newcommand{\@titlepagerulewidth}{3.0in} % use dimen? probably more kosher but less readable
-\newcommand{\@titlepagerule}[1]{\rule{\@titlepagerulewidth}{0.15mm}\\#1\vspace*{2mm}}
+\newcommand{\@titlepagerule}{\rule{\@titlepagerulewidth}{0.15mm}}
+\newcommand{\@titlepageblock}[1]{
+  \@titlepagerule{}\\
+  \vspace*{0.6\baselineskip}
+  #1\\
+  \@titlepagerule{}
+  \vspace*{2mm}
+}
 
 
 \newcommand{\@titlepage}{
@@ -94,9 +116,8 @@
   \end{textblock*}
   \begin{textblock*}{\textwidth}(1.5in, 4in)
     \begin{center}
-      \@titlepagerule{THESIS}\\
-      \@titlepagerule{} % TODO: figure out the spacing on this.
-      A thesis submitted in partial fulfillment of the\\
+      \@titlepageblock{\@DOCTYPE}\\
+      A \@doctype{} submitted in partial fulfillment of the\\
       requirements for the degree of \@degree{}\\
       in the College of \@college\\
       at the University of Kentucky\\
@@ -142,7 +163,7 @@
   \thispagestyle{plain}
   \begin{textblock*}{\textwidth}(1.5in, 2.5in)
   \begin{center}
-    ABSTRACT OF THESIS
+    ABSTRACT OF \@DOCTYPE
   \end{center}
   \end{textblock*}
   \begin{textblock*}{\textwidth}(1.5in, 3.5in)
@@ -181,10 +202,10 @@
   \begin{textblock*}{\@signaturewidth}(\paperwidth - \@signaturewidth - 1in,7in)
     \centering
     \ifdefempty{\@codirector}{
-      \noindent\@signature{Director of Thesis}{\@director} \\
+      \noindent\@signature{Director of \@DocType}{\@director} \\
     }{
-      \noindent\@signature{Co-Director of Thesis}{\@director} \\
-      \noindent\@signature{Co-Director of Thesis}{\@codirector} \\
+      \noindent\@signature{Co-Director of \@DocType}{\@director} \\
+      \noindent\@signature{Co-Director of \@DocType}{\@codirector} \\
     }
     \noindent\@signature{Director of Graduate Studies}{\@dgs} \\
     \noindent\@signature{Date}{\@submissionmonth/\@submissionday/\@submissionyear} \\
@@ -286,4 +307,4 @@
 % make chapter TOC entries uppercase. Also prevent hyperref complaining about the MakeUppercase macro.
 \renewcommand\addchaptertocentry[2]{%
   \addtocentrydefault{chapter}{#1}{\texorpdfstring{\MakeUppercase{#2}}{#2}}%
-} 
+}
